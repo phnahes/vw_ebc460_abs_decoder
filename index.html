@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>18-Byte VIN Decoder</title>
   <style>
     body {
@@ -62,12 +63,29 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    th,
+    th {
+      background: #f1f1f1;
+      font-weight: 600;
+      white-space: normal;
+      /* Permite quebra de linha */
+      word-break: break-word;
+      /* Quebra palavras longas */
+    }
+
+    td:nth-child(1),
+    td:nth-child(2) {
+      white-space: nowrap;
+    }
+
     td {
       border: 1px solid #ddd;
       padding: 10px;
       text-align: left;
       font-size: 0.95rem;
+      word-break: break-word;
+      /* <- Isso permite quebrar palavras longas */
+      white-space: normal;
+      /* <- Isso permite quebrar a linha */
     }
 
     th {
@@ -88,46 +106,17 @@
     }
 
     @media (max-width: 680px) {
-      .input-group {
-        flex-direction: column;
+      table {
+        display: block;
+        overflow-x: auto;
       }
 
-      table,
       thead,
       tbody,
       th,
       td,
       tr {
-        display: block;
-        width: 100%;
-      }
-
-      thead {
-        display: none;
-      }
-
-      tr {
-        margin-bottom: 12px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background: #fff;
-        padding: 10px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
-      }
-
-      td {
-        border: none;
-        padding: 8px 10px;
-        position: relative;
-      }
-
-      td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        color: #777;
-        display: block;
-        margin-bottom: 5px;
-        font-size: 0.8rem;
+        display: revert;
       }
     }
   </style>
@@ -135,11 +124,16 @@
 </head>
 
 <body>
-  <h1>18-Byte ABS LongCoding Decoder (460 EBC)</h1>
-  <p>Enter 18–19 hex bytes / LongCoding (e.g., <code>10CC047803AE10F4EF00F50000A900000000</code>:</p>
-  <input type="text" id="inputVIN" placeholder="Enter VIN (optional)" style="margin-bottom: 10px; display: block;">
-  <input type="text" id="inputBytes" placeholder="Enter Long Conding">
-  <button onclick="decodeBytes()">Decode</button>
+  <h1>ABS Long Coding Decoder — 18 Bytes (VW 460 EBC)</h1>
+  <p>
+    Paste your 18–19 byte hex long coding and optionally a VIN to decode and validate configuration data.<br>
+    Example: <code>10CC047803AE10F4EF00F50000A900000000</code>
+  </p>
+  <div class="input-group">
+    <input type="text" id="inputVIN" placeholder="Enter VIN (optional)">
+    <input type="text" id="inputBytes" placeholder="Enter Long Coding">
+    <button onclick="decodeBytes()">Decode</button>
+  </div>
   <div id="output"></div>
 
   <script>

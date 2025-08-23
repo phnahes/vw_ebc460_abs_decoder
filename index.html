@@ -4,130 +4,533 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>18-Byte VIN Decoder</title>
+  <title>EBC 460 ABS LongCoding Decoder - Professional Tool</title>
+  <meta name="description" content="Professional ABS LongCoding decoder for VW EBC 460 modules. Supports PQ25, PQ26, and Premium platforms with advanced VIN validation.">
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-light: #60a5fa;
+      --primary-lighter: #93c5fd;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --success: #22c55e;
+      --success-light: #4ade80;
+      --warning: #f59e0b;
+      --error: #f87171;
+      --error-light: #fca5a5;
+      
+      /* Light color palette */
+      --gray-25: #fcfcfd;
+      --gray-50: #f8fafc;
+      --gray-75: #f1f5f9;
+      --gray-100: #e2e8f0;
+      --gray-200: #cbd5e0;
+      --gray-300: #a0aec0;
+      --gray-400: #718096;
+      --gray-500: #4a5568;
+      --gray-600: #2d3748;
+      --gray-700: #1a202c;
+      
+      /* Soft shadows */
+      --border-radius: 10px;
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06);
+      
+      /* Text colors - lighter */
+      --text-primary: #2d3748;
+      --text-secondary: #718096;
+      --text-muted: #a0aec0;
+      --border-light: #e2e8f0;
+      
+      /* Status colors - softer */
+      --success-bg: #f0fff4;
+      --success-border: #9ae6b4;
+      --error-bg: #fff5f5;
+      --error-border: #fca5a5;
+      --info-bg: #f0f9ff;
+      --info-border: #93c5fd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-      color: #333;
-      max-width: 960px;
-      margin: auto;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, var(--gray-25), var(--gray-50));
+      color: var(--text-primary);
+      min-height: 100vh;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.5rem;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
     }
 
-    p {
-      font-size: 0.95rem;
-      margin-bottom: 1.2rem;
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 3rem 1.5rem 2rem;
     }
 
-    .input-group {
+    .header h1 {
+      font-size: 2.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .header .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin: 0 auto 2rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .platform-badges {
       display: flex;
+      gap: 0.75rem;
+      justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 1rem;
+      margin-top: 1rem;
     }
 
-    input[type="text"] {
-      flex: 1;
-      min-width: 240px;
-      font-size: 1rem;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    .badge {
+      padding: 0.5rem 1.25rem;
+      border-radius: 25px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #007bff;
+    .badge:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .input-section {
+      background: white;
+      padding: 2.5rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-light);
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .input-section h2 {
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin: 0 0 2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr auto;
+      gap: 1.5rem;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-group input {
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+      transition: all 0.3s ease;
+      background: white;
+      width: 100%;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input::placeholder {
+      color: var(--gray-400);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .decode-btn {
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
     }
 
-    button:hover {
-      background: #0056b3;
+    .decode-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
     }
 
-    table {
+    .decode-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .results-section {
+      margin-top: 2rem;
+    }
+
+    .platform-detected {
+      background: var(--success-bg);
+      color: var(--success);
+      padding: 1.25rem 2rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--success-border);
+      margin-bottom: 2rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      font-size: 1.1rem;
+    }
+
+    .results-table {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      margin-bottom: 1.5rem;
+    }
+
+    .results-table table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1.5rem;
-      background: white;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin: 0;
     }
 
-    th {
-      background: #f1f1f1;
-      font-weight: 600;
-      white-space: normal;
-      /* Permite quebra de linha */
-      word-break: break-word;
-      /* Quebra palavras longas */
-    }
-
-    td:nth-child(1),
-    td:nth-child(2) {
-      white-space: nowrap;
-    }
-
-    td {
-      border: 1px solid #ddd;
-      padding: 10px;
+    .results-table th {
+      background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-75) 100%);
+      color: var(--text-primary);
+      padding: 1.5rem 1.5rem;
       text-align: left;
+      font-weight: 600;
       font-size: 0.95rem;
-      word-break: break-word;
-      /* <- Isso permite quebrar palavras longas */
-      white-space: normal;
-      /* <- Isso permite quebrar a linha */
+      border-bottom: 2px solid var(--border-light);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
 
-    th {
-      background: #f1f1f1;
+    .results-table td {
+      padding: 1.5rem 1.5rem;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: top;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .results-table tr:hover {
+      background: linear-gradient(90deg, var(--gray-50) 0%, rgba(59, 130, 246, 0.02) 100%);
+    }
+
+    .byte-number {
+      font-weight: 700;
+      color: var(--primary);
+      font-family: 'SF Mono', 'Monaco', monospace;
+      font-size: 1rem;
+      background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .byte-hex {
+      font-family: 'SF Mono', 'Monaco', monospace;
+      background: linear-gradient(135deg, var(--info-bg) 0%, #e0f2fe 100%);
+      color: var(--primary);
+      padding: 0.5rem 0.875rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid var(--info-border);
+      box-shadow: var(--shadow-xs);
+      display: inline-block;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .byte-description {
+      line-height: 1.7;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .byte-description strong {
+      color: var(--primary);
       font-weight: 600;
+    }
+
+    .vin-validation-section {
+      background: var(--gray-50);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .vin-validation-section th {
+      background: var(--gray-75);
+      color: var(--text-primary);
+    }
+
+    .vin-valid {
+      background: var(--success-bg);
+      border-left: 3px solid var(--success-light);
     }
 
     .vin-valid::before {
-      content: "✔️ ";
-      color: green;
-      font-weight: bold;
+      content: "✓";
+      color: var(--success);
+      font-weight: 600;
+      margin-right: 0.75rem;
+      font-size: 1.1em;
+    }
+
+    .vin-invalid {
+      background: var(--error-bg);
+      border-left: 3px solid var(--error-light);
     }
 
     .vin-invalid::before {
-      content: "❌ ";
-      color: red;
-      font-weight: bold;
+      content: "✗";
+      color: var(--error);
+      font-weight: 600;
+      margin-right: 0.75rem;
+      font-size: 1.1em;
     }
 
-    @media (max-width: 680px) {
-      table {
-        display: block;
-        overflow-x: auto;
+    .checksum-valid {
+      background: rgba(34, 197, 94, 0.03);
+      border-left: 2px solid var(--success-light);
+    }
+
+    .checksum-invalid {
+      background: rgba(248, 113, 113, 0.03);
+      border-left: 2px solid var(--error-light);
+    }
+
+    .error-message {
+      background: var(--error-bg);
+      color: var(--error);
+      padding: 1.25rem 2rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--error-border);
+      margin-top: 2rem;
+      text-align: center;
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      border: 2px solid var(--gray-200);
+      border-top: 2px solid var(--primary);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsividade aprimorada */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
       }
 
-      thead,
-      tbody,
-      th,
-      td,
-      tr {
-        display: revert;
+      .header {
+        margin-bottom: 2rem;
+        padding: 2rem 1rem 1.5rem;
       }
+
+      .header h1 {
+        font-size: 2.25rem;
+      }
+
+      .input-section {
+        padding: 2rem 1.5rem;
+      }
+
+      .input-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      .decode-btn {
+        width: 100%;
+        padding: 1.25rem;
+      }
+
+      .results-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .results-table th,
+      .results-table td {
+        padding: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .platform-badges {
+        gap: 0.5rem;
+      }
+
+      .badge {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 1.875rem;
+      }
+
+      .header .subtitle {
+        font-size: 1rem;
+      }
+
+      .input-section {
+        padding: 1.5rem 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .results-table th,
+      .results-table td {
+        padding: 0.875rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --border-light: #374151;
+      }
+
+      body {
+        background: #111827;
+        color: var(--text-primary);
+      }
+
+      .input-section,
+      .results-table {
+        background: #1f2937;
+        border-color: var(--border-light);
+      }
+
+      .form-group input {
+        background: #374151;
+        border-color: #4b5563;
+        color: var(--text-primary);
+      }
+
+      .form-group input::placeholder {
+        color: #9ca3af;
+      }
+
+      .results-table tr:hover {
+        background: rgba(55, 65, 81, 0.5);
+      }
+
+      .vin-validation-section {
+        background: #1f2937;
+      }
+    }
+
+    /* Animações suaves */
+    .results-section {
+      animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fadeIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(24px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
+    }
+
+    /* Transições suaves para todos elementos interativos */
+    * {
+      transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
   </style>
 
 </head>
 
 <body>
-  <h1>ABS Long Coding Decoder — 18 Bytes (VW 460 EBC)</h1>
+  <h1>ABS Long Coding Decoder — EBC 460 (Multi-Platform)</h1>
   <p>
-    Paste your 18–19 byte hex long coding and optionally a VIN to decode and validate configuration data.<br>
-    Example: <code>10CC047803AE10F4EF00F50000A900000000</code>
+    Paste your hex long coding and optionally a VIN to decode configuration data. Supports:<br>
+    • <strong>PQ25:</strong> 19 bytes (18 if counted from zero)<br>
+    • <strong>PQ26:</strong> 20 bytes (19 if counted from zero)<br>
+    • <strong>Premium:</strong> 24 bytes (23 if counted from zero)<br>
+    Example: <code>43F82876897F00D8C22A142B912400794F0800C1</code> (PQ26 - 20 bytes)
+    Example: <code>10CC047803AE10F4EF00F50000A900000000</code> (PQ25 - 19 bytes)
+    Example: <code></code>18CC047803AE10F4EF00F50000A900000000</code> (PQ25 - 18 bytes)
+
   </p>
   <div class="input-group">
     <input type="text" id="inputVIN" placeholder="Enter VIN (optional)">
@@ -203,7 +606,30 @@
         "checksum": true
       },
       "0D": {
-        "A9": "17th VIN char = 0",
+        // 17th VIN character - From .lbl file with platform-specific codes
+        // PQ25 codes (lines 162-171)
+        "A0": "PQ25: 17th VIN digit = 0",
+        "A1": "PQ25: 17th VIN digit = 1",
+        "A2": "PQ25: 17th VIN digit = 2",
+        "A3": "PQ25: 17th VIN digit = 3",
+        "A4": "PQ25: 17th VIN digit = 4",
+        "A5": "PQ25: 17th VIN digit = 5",
+        "A6": "PQ25: 17th VIN digit = 6",
+        "A7": "PQ25: 17th VIN digit = 7",
+        "A8": "PQ25: 17th VIN digit = 8",
+        "A9": "PQ25: 17th VIN digit = 9",
+        // PQ26 codes (lines 172-181)
+        "22": "PQ26: 17th VIN digit = 0", 
+        "23": "PQ26: 17th VIN digit = 1",
+        "24": "PQ26: 17th VIN digit = 2",
+        "25": "PQ26: 17th VIN digit = 3",
+        "26": "PQ26: 17th VIN digit = 4",
+        "27": "PQ26: 17th VIN digit = 5",
+        "28": "PQ26: 17th VIN digit = 6",
+        "29": "PQ26: 17th VIN digit = 7",
+        "2A": "PQ26: 17th VIN digit = 8",
+        "2B": "PQ26: 17th VIN digit = 9",
+        // Legacy codes
         "AA": "17th VIN char = 1",
         "AB": "17th VIN char = 2",
         "AC": "17th VIN char = 3",
@@ -228,6 +654,30 @@
         "checksum": true
       },
       "09": {
+        // 15th VIN character - From .lbl file with platform-specific codes
+        // PQ25 codes (lines 95-104)
+        "47": "PQ25: 15th VIN digit = 0",
+        "48": "PQ25: 15th VIN digit = 1",
+        "49": "PQ25: 15th VIN digit = 2",
+        "4A": "PQ25: 15th VIN digit = 3",
+        "4B": "PQ25: 15th VIN digit = 4", 
+        "4C": "PQ25: 15th VIN digit = 5",
+        "4D": "PQ25: 15th VIN digit = 6",
+        "4E": "PQ25: 15th VIN digit = 7",
+        "4F": "PQ25: 15th VIN digit = 8",
+        "50": "PQ25: 15th VIN digit = 9",
+        // PQ26 codes (lines 105-114)
+        "23": "PQ26: 15th VIN digit = 0",
+        "24": "PQ26: 15th VIN digit = 1",
+        "25": "PQ26: 15th VIN digit = 2",
+        "26": "PQ26: 15th VIN digit = 3", 
+        "27": "PQ26: 15th VIN digit = 4",
+        "28": "PQ26: 15th VIN digit = 5",
+        "29": "PQ26: 15th VIN digit = 6",
+        "2A": "PQ26: 15th VIN digit = 7",
+        "2B": "PQ26: 15th VIN digit = 8",
+        "2C": "PQ26: 15th VIN digit = 9",
+        // Legacy codes
         "FA": "15th VIN char = 0",
         "FB": "15th VIN char = 1",
         "FC": "15th VIN char = 2",
@@ -253,6 +703,30 @@
         "checksum": true
       },
       "0B": {
+        // 16th VIN character - From .lbl file with platform-specific codes  
+        // PQ25 codes (lines 126-135)
+        "D2": "PQ25: 16th VIN digit = 0",
+        "D3": "PQ25: 16th VIN digit = 1",
+        "D4": "PQ25: 16th VIN digit = 2",
+        "D5": "PQ25: 16th VIN digit = 3",
+        "D6": "PQ25: 16th VIN digit = 4",
+        "D7": "PQ25: 16th VIN digit = 5",
+        "D8": "PQ25: 16th VIN digit = 6",
+        "D9": "PQ25: 16th VIN digit = 7", 
+        "DA": "PQ25: 16th VIN digit = 8",
+        "DB": "PQ25: 16th VIN digit = 9",
+        // PQ26 codes (lines 136-145)
+        "2A": "PQ26: 16th VIN digit = 0",
+        "2B": "PQ26: 16th VIN digit = 1",
+        "2C": "PQ26: 16th VIN digit = 2",
+        "2D": "PQ26: 16th VIN digit = 3",
+        "2E": "PQ26: 16th VIN digit = 4",
+        "2F": "PQ26: 16th VIN digit = 5",
+        "30": "PQ26: 16th VIN digit = 6",
+        "31": "PQ26: 16th VIN digit = 7",
+        "32": "PQ26: 16th VIN digit = 8", 
+        "33": "PQ26: 16th VIN digit = 9",
+        // Legacy codes
         "F5": "16th VIN char = 0",
         "F6": "16th VIN char = 1",
         "F7": "16th VIN char = 2",
@@ -275,12 +749,38 @@
         "13": "VIN 9BW: 16th = 9"
       },
       "06": {
-        "00": "Drivetrain: Standard, ESP [1AT/1AP], ABS [1AC]",
-        "02": "Drivetrain: VW up!/Seat Mii/Skoda Citigo, ESP [1AT]",
-        "08": "Drivetrain: Rapid Sedan China, MABS [1AC]",
-        "10": "Drivetrain: Standard, MABS [1AC]"
+        // Drivetrain type - From .lbl file lines 61-63
+        "00": "Drivetrain: Rapid/Toledo PQ26 ESP [1AS/1AT/1AZ]",
+        "08": "Drivetrain: Jetta China MABS [1AC]", 
+        "10": "Drivetrain: Rapid/Toledo PQ25 MABS [1AC]",
+        // Legacy codes
+        "02": "Drivetrain: VW up!/Seat Mii/Skoda Citigo, ESP [1AT]"
       },
       "07": {
+        // 14th VIN character - From .lbl file with platform-specific codes
+        // PQ25 codes (lines 66-75)  
+        "B4": "PQ25: 14th VIN digit = 0",
+        "B5": "PQ25: 14th VIN digit = 1",
+        "B6": "PQ25: 14th VIN digit = 2", 
+        "B7": "PQ25: 14th VIN digit = 3",
+        "B8": "PQ25: 14th VIN digit = 4",
+        "B9": "PQ25: 14th VIN digit = 5",
+        "BA": "PQ25: 14th VIN digit = 6",
+        "BB": "PQ25: 14th VIN digit = 7",
+        "BC": "PQ25: 14th VIN digit = 8",
+        "BD": "PQ25: 14th VIN digit = 9",
+        // PQ26 codes (lines 76-85)
+        "D3": "PQ26: 14th VIN digit = 0",
+        "D4": "PQ26: 14th VIN digit = 1", 
+        "D5": "PQ26: 14th VIN digit = 2",
+        "D6": "PQ26: 14th VIN digit = 3",
+        "D7": "PQ26: 14th VIN digit = 4",
+        "D8": "PQ26: 14th VIN digit = 5",
+        "D9": "PQ26: 14th VIN digit = 6",
+        "DA": "PQ26: 14th VIN digit = 7", 
+        "DB": "PQ26: 14th VIN digit = 8",
+        "DC": "PQ26: 14th VIN digit = 9",
+        // Legacy codes
         "F1": "14th VIN char = 0",
         "F2": "14th VIN char = 1",
         "F3": "14th VIN char = 2",
@@ -326,16 +826,34 @@
         }
       },
       "05": {
+        // 13th VIN character - From .lbl file with platform-specific codes
+        // PQ25 codes (lines 41-50)
+        "B1": "PQ25: 13th VIN digit = 0",
+        "B2": "PQ25: 13th VIN digit = 1", 
+        "B3": "PQ25: 13th VIN digit = 2",
+        "B4": "PQ25: 13th VIN digit = 3",
+        "B5": "PQ25: 13th VIN digit = 4",
+        "B6": "PQ25: 13th VIN digit = 5",
+        "B7": "PQ25: 13th VIN digit = 6",
+        "B8": "PQ25: 13th VIN digit = 7", 
+        "B9": "PQ25: 13th VIN digit = 8",
+        "BA": "PQ25: 13th VIN digit = 9",
+        // PQ26 codes (lines 51-60)
+        "7E": "PQ26: 13th VIN digit = 0",
+        "7F": "PQ26: 13th VIN digit = 1",
+        "80": "PQ26: 13th VIN digit = 2",
+        "81": "PQ26: 13th VIN digit = 3",
+        "82": "PQ26: 13th VIN digit = 4", 
+        "83": "PQ26: 13th VIN digit = 5",
+        "84": "PQ26: 13th VIN digit = 6",
+        "85": "PQ26: 13th VIN digit = 7",
+        "86": "PQ26: 13th VIN digit = 8",
+        "87": "PQ26: 13th VIN digit = 9",
+        // Legacy codes for other platforms
+        "AD": "13th VIN char = 0",
         "AE": "13th VIN char = 1",
         "AF": "13th VIN char = 2",
         "B0": "13th VIN char = 3",
-        "B1": "13th VIN char = 4",
-        "B2": "13th VIN char = 5",
-        "B3": "13th VIN char = 6",
-        "B4": "13th VIN char = 7",
-        "B5": "13th VIN char = 8",
-        "B6": "13th VIN char = 9",
-        "AD": "13th VIN char = 0",
         "EF": "VIN starting 9BW: 13th digit = 0",
         "F0": "VIN starting 9BW: 13th digit = 1",
         "F1": "VIN starting 9BW: 13th digit = 2",
@@ -362,6 +880,15 @@
         }
       },
       "00": {
+        // Platform/Model codes from Drive2.ru article
+        // For 6R0614117* and 6R0614517* units (PQ25/PQ26)
+        "41": "Rapid Liftback/Spaceback PQ25 [L0L]",
+        "42": "Rapid Liftback/Spaceback PQ25 [L0R]", 
+        "43": "Rapid Liftback/Spaceback PQ26, Toledo PQ26 [L0L]",
+        "44": "Rapid Liftback/Spaceback PQ26, Toledo PQ26 [L0R]",
+        "51": "Toledo PQ25 [L0L]",
+        "52": "Toledo PQ25 [L0R]",
+        // For 12E614517*, 1S0614117*, 1S0614517*, 5U0614117*, 6RD614117* units
         "10": "VW Gol [L0L]",
         "11": "VW up! [L0R]",
         "12": "VW up! [L0L]",
@@ -370,25 +897,34 @@
         "22": "Seat Mii [L0L]",
         "31": "Skoda Citigo [L0R]",
         "32": "Skoda Citigo [L0L]",
-        "42": "Skoda Rapid Liftback [L0R]",
-        "43": "Skoda Rapid Liftback [L0L]",
         "44": "VW e-Up! / Skoda Citigoe / Seat Mii electric [L0L]",
-        "52": "Seat Toledo [L0R]",
         "53": "Seat Toledo [L0L]",
-        "60": "VW up! CWRA engine [L0L]",
+        "60": "VW up! EBC 460 ABS [L0L] (CWRA engine)",
         "85": "Skoda Rapid Sedan China [L0L]",
-        "93": "Skoda Rapid Spaceback [L0L]",
+        "93": "Jetta China PQ25 [L0L]", // From .lbl file line 11
         "94": "Skoda Rapid Spaceback [L0R]",
         "B8": "VW up! GTI [L0R]",
         "B9": "VW up! GTI [L0L]"
       },
       "01": {
+        // 7th VIN character codes from Drive2.ru article
+        // For 6R0614117* and 6R0614517* units (PQ25/PQ26) - From .lbl file
+        "1D": "7th VIN char: B (PQ25)", // Line 14
+        "29": "7th VIN char: N (PQ25)", // Line 15  
+        "F8": "7th VIN char: N (PQ26)", // Line 16
+        // For 12E614517*, 1S0614117*, 1S0614517*, 5U0614117*, 6RD614117* units
         "BF": "7th VIN char: A",
         "CC": "7th VIN char: N",
         "DF": "7th VIN char: 1",
         "E3": "7th VIN char: 5"
       },
       "03": {
+        // 8th VIN character codes from Drive2.ru article  
+        // For 6R0614117* and 6R0614517* units (PQ25/PQ26) - From .lbl file
+        "14": "8th VIN char: H (PQ25)", // Line 26
+        "1F": "8th VIN char: S (PQ25)", // Line 27
+        "76": "8th VIN char: H (PQ26)", // Line 28 
+        // For 12E614517*, 1S0614117*, 1S0614517*, 5U0614117*, 6RD614117* units
         "06": "8th VIN char: U",
         "71": "8th VIN char: A",
         "77": "8th VIN char: G",
@@ -426,47 +962,314 @@
       const bytes = input.match(/.{1,2}/g);
       const outputDiv = document.getElementById("output");
 
-      if (!bytes || bytes.length < 18 || bytes.length > 20) {
-        outputDiv.innerHTML = '<p style="color:red;">Please enter between 18 and 20 valid hex bytes.</p>';
+      if (!bytes || bytes.length < 18 || bytes.length > 24) {
+        outputDiv.innerHTML = `
+          <div class="error-message">
+            <strong>Invalid Input!</strong><br>
+            Please enter between 18 and 24 valid hex bytes.<br>
+            Supported: 18-19 bytes (PQ25), 20 bytes (PQ26), 24 bytes (Premium)
+          </div>
+        `;
         return;
       }
 
-      let html = '<table><tr><th>Byte #</th><th>Hex</th><th>Description</th></tr>';
+      // Show loading state
+      outputDiv.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Decoding Long Coding...</p>
+        </div>
+      `;
 
-      bytes.slice(0, 20).forEach((byte, index) => {
+      // Simulate processing delay for better UX
+      setTimeout(() => {
+        // Detect platform based on byte count
+        let platform = "Unknown";
+        let platformClass = "platform-detected";
+        if (bytes.length === 18 || bytes.length === 19) platform = "PQ25";
+        else if (bytes.length === 20) platform = "PQ26";
+        else if (bytes.length === 24) platform = "Premium";
+        
+        let html = `
+          <div class="${platformClass}">
+            Platform Detected: <strong>${platform}</strong> (${bytes.length} bytes)
+          </div>
+          <div class="results-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Byte</th>
+                  <th>Hex</th>
+                  <th>Configuration</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+      bytes.slice(0, 24).forEach((byte, index) => {
         const byteIndex = index.toString(16).padStart(2, '0').toUpperCase();
         const val = parseInt(byte, 16);
         let desc = "Not mapped or mirrored/checksum";
 
         try {
           if (byteIndex === "02") {
-            const rear = (val & 0x0F).toString(16).toUpperCase().padStart(2, '0');
-            const front = (val & 0xF0).toString(16).toUpperCase().padStart(2, '0');
-            desc = `${lookupTable["02"].rear[rear] || "Rear: Unknown"} | ${lookupTable["02"].front[front] || "Front: Unknown"}`;
+            // Brake configuration - decode by specific bits as per Drive2.ru article
+            const rearBits = (val & 0x0F); // bits 2-3 for rear brake type
+            const frontBits = (val & 0xF0); // bits 5-6 for front brake diameter
+            
+            let rearDesc = "Rear: Unknown";
+            let frontDesc = "Front: Unknown";
+            
+            // Determine platform for different brake coding - Enhanced from .lbl file
+            if (platform === "PQ25" || platform === "PQ26") {
+              // For 6R0614117* and 6R0614517* units - From .lbl lines 17-23
+              switch(rearBits) {
+                case 0x04: rearDesc = "Rear: Drum 200mm [1KL/1KH]"; break;
+                case 0x06: rearDesc = "Rear: Disc 230mm [1KX]"; break; // From .lbl line 18
+                case 0x08: rearDesc = "Rear: Disc 232mm [1KT]"; break; 
+                case 0x0C: rearDesc = "Rear: Disc 256/272mm"; break;
+              }
+              switch(frontBits) {
+                case 0x20: frontDesc = "Front: 256mm [1ZG]"; break;
+                case 0x40: frontDesc = "Front: 288mm [1ZC]"; break;
+                case 0x60: frontDesc = "Front: 312mm"; break;
+              }
+            } else {
+              // For 12E614517*, 1S0614117*, etc. units  
+              switch(rearBits) {
+                case 0x04: rearDesc = "Rear: Drum 200mm [1KB/1KM/1JL]"; break;
+                case 0x08: rearDesc = "Rear: Drum 200mm VW Gol/Voyage [1KB], Drum 228mm Toledo [1KL], Disc 232mm Rapid [1KT]"; break;
+                case 0x0C: rearDesc = "Rear: Drum 200mm [1KH/1KL]"; break;
+                case 0x0E: rearDesc = "Rear: Drum 230mm Rapid China [1KC/1KG]"; break;
+              }
+              switch(frontBits) {
+                case 0x20: frontDesc = "Front: 256mm [1LA/1LF/1LQ/1LR/1ZE/1ZG/1ZQ]"; break;
+                case 0x40: frontDesc = "Front: 288mm [1ZC/1LL]"; break;
+                case 0x60: frontDesc = "Front: 288mm [1ZJ]"; break;
+                case 0x90: frontDesc = "Front: 236mm [1LP]"; break;
+              }
+            }
+            
+            desc = `${rearDesc} | ${frontDesc}`;
           } else if (byteIndex === "04") {
-            const susp = (val & 0x07).toString(16).toUpperCase().padStart(2, '0');
-            const trans = (val & 0x18).toString(16).toUpperCase().padStart(2, '0');
-            const steer = (val & 0xE0).toString(16).toUpperCase().padStart(2, '0');
-            desc = `${lookupTable["04"].suspension[susp] || "Susp: Unknown"} | ${lookupTable["04"].transmission[trans] || "Trans: Unknown"} | ${lookupTable["04"].steering[steer] || "Steering: Unknown"}`;
+            // Chassis configuration - different decoding per platform as per Drive2.ru
+            let chassisDesc = "";
+            
+            if (platform === "PQ25" || platform === "PQ26") {
+              // For 6R0614117* and 6R0614517* units (Rapid/Toledo)
+              const sensorBits = val & 0x07; // bits 0-2: Steering angle sensor type
+              const espBits = val & 0x18;    // bits 3-4: ESP system and servo brake
+              const steerBits = val & 0xE0;  // bits 5-7: Steering angle sensor connection
+              
+              let sensorDesc = "Sensor: Unknown";
+              let espDesc = "ESP: Unknown"; 
+              let steerDesc = "Connection: Unknown";
+              
+              switch(sensorBits) {
+                case 1: sensorDesc = "Sensor: Option 1 [1AC/1AT+1N3], [1AZ+1N1/1N3]"; break;
+                case 2: sensorDesc = "Sensor: Option 2 [1AT+1N1], [1AS+1N1/1N3]"; break;
+                case 3: sensorDesc = "Sensor: Option 3 (rare MG2019) [1AS+1N3]"; break;
+              }
+              
+              switch(espBits) {
+                case 0x08: espDesc = "ESP: Manual w/o servo brake [1AC/1AT]"; break;
+                case 0x10: espDesc = "ESP: Automatic w/ servo brake [1AS]"; break;
+                case 0x18: espDesc = "ESP: Manual w/ servo brake [1AZ]"; break;
+              }
+              
+              switch(steerBits) {
+                case 0x00: steerDesc = "Connection: To ABS block 3, electro-hydraulic [1N2]"; break;
+                case 0x80: steerDesc = "Connection: To steering block 44, electromechanical [1N1/1N3]"; break;
+              }
+              
+              chassisDesc = `${sensorDesc} | ${espDesc} | ${steerDesc}`;
+              
+            } else {
+              // For 12E614517*, 1S0614117*, etc. units (up!/Mii/Citigo)
+              const suspBits = val & 0x07; // bits 0-2: Rear suspension  
+              const espBits = val & 0x18;  // bits 3-4: ESP and sensors
+              const steerBits = val & 0xE0; // bits 5-7: Power steering type
+              
+              let suspDesc = "Suspension: Unknown";
+              let espDesc = "ESP: Unknown";
+              let steerDesc = "Steering: Unknown";
+              
+              switch(suspBits) {
+                case 0: suspDesc = "Suspension: For South America [1JQ]"; break;
+                case 1: suspDesc = "Suspension: Standard [1JA/1JD/UB6]"; break; 
+                case 2: suspDesc = "Suspension: For bad roads [1JB/1JL]"; break;
+                case 3: suspDesc = "Suspension: Sport [1JC/1JJ]"; break;
+              }
+              
+              switch(espBits) {
+                case 0x00: espDesc = "ESP: For South America [0EM/0EI+1AC/1AT]"; break;
+                case 0x08: espDesc = "ESP: With EBV [0EA/0EG/0EJ/0EM/0ER/0ID+1AC/1AT]"; break;
+                case 0x18: espDesc = "ESP: Electric + EBKV [0EZ+1AP]"; break;
+              }
+              
+              switch(steerBits) {
+                case 0x00: steerDesc = "Steering: Electro-hydraulic [1N2]"; break;
+                case 0x20: steerDesc = "Steering: Electromechanical + Vacuum pump [1N3]"; break;
+                case 0x60: steerDesc = "Steering: Rapid Sedan China [1N6]"; break;
+                case 0x80: steerDesc = "Steering: Electromechanical [1N1/1N3/1N4]"; break;
+                case 0xC0: steerDesc = "Steering: VW up! South America CWRA [1N3]"; break;
+              }
+              
+              chassisDesc = `${suspDesc} | ${espDesc} | ${steerDesc}`;
+            }
+            
+            desc = chassisDesc;
           } else if (byteIndex === "0F") {
-            const engine = (val & 0x0F).toString(16).toUpperCase().padStart(2, '0');
-            const ss = (val & 0x30).toString(16).toUpperCase().padStart(2, '0');
-            const steer = (val & 0xC0).toString(16).toUpperCase().padStart(2, '0');
-            desc = `${lookupTable["0F"].engine[engine] || "Engine: Unknown"} | ${lookupTable["0F"].startstop[ss] || "Start/Stop: Unknown"} | ${lookupTable["0F"].steering[steer] || "Steering: Unknown"}`;
+            // Byte 15: Corrected implementation based on Drive2.ru specifications
+            const torqueBits = val & 0x07;      // bits 0-2: Initial torque (3 bits, not 4!)
+            const rdksBit = (val & 0x08) >> 3;   // bit 3: RDKS+/TPMS+ CAN transmission (PQ26 only)
+            const startStopBit = (val & 0x10) >> 4; // bit 4: Start-Stop system
+            const dsrBit = (val & 0x20) >> 5;       // bit 5: DSR protocol disable (PQ26 only)
+            const steeringBits = (val & 0xC0);      // bits 6-7: Steering wheel position (keep as hex)
+            
+            let torqueDesc = "Initial torque: Unknown";
+            let rdksDesc = rdksBit ? "RDKS+/TPMS+ CAN: Enabled (PQ26)" : "RDKS+/TPMS+ CAN: Disabled/Not used";
+            let startStopDesc = startStopBit ? "Start-Stop: Enabled" : "Start-Stop: Disabled";
+            let dsrDesc = dsrBit ? "DSR protocol: Disabled (PQ26)" : "DSR protocol: Enabled/Not used (PQ25)";
+            let steeringDesc = "Steering position: Unknown";
+            
+            // Steering wheel position - corrected values from Drive2.ru
+            switch(steeringBits) {
+              case 0x40: steeringDesc = "Steering: Left hand drive [L0L]"; break;
+              case 0x80: steeringDesc = "Steering: Right hand drive [L0R]"; break;
+              default: steeringDesc = `Steering: Unknown (${steeringBits.toString(16).toUpperCase()}h)`; break;
+            }
+            
+            if (platform === "PQ25" || platform === "PQ26") {
+              // For 6R0614117* and 6R0614517* units (Rapid/Toledo) - Drive2.ru specs
+              switch(torqueBits) {
+                case 0: torqueDesc = "Initial torque: CAYB/CAYC 1.6TDI, CAXA 1.4TSI, CBZA/CBZB 1.2TSI"; break;
+                case 1: torqueDesc = "Initial torque: CWVA/CWVB 1.6MPI, CHZB/CHZC 1.0TFS, CJZC/CJZD 1.2TSI, CZCA 1.4TSI, CUSB 1.4TDI, CXMA 1.6TDI"; break;
+                default: torqueDesc = `Initial torque: Unknown configuration (${torqueBits})`; break;
+              }
+            } else {
+              // For 12E614517*, 1S0614117*, etc. units (up!/Mii/Citigo) - Drive2.ru specs
+              switch(torqueBits) {
+                case 0: torqueDesc = "Initial torque: CFNA/CFZA/CPD 1.6MPI, CHYA/CHYB/CHYE/CWRA 1.0MPI, CYTA/DKRA 1.0TSI, CBZA/CBZB 1.2TSI, CAYB/CAYC 1.6TDI"; break;
+                case 1: torqueDesc = "Initial torque: EABA/EBMA, CHZA 1.0TFS"; break;
+                default: torqueDesc = `Initial torque: Unknown configuration (${torqueBits})`; break;
+              }
+            }
+            
+            // Show different info based on platform
+            if (platform === "PQ26") {
+              desc = `${torqueDesc} | ${rdksDesc} | ${startStopDesc} | ${dsrDesc} | ${steeringDesc}`;
+            } else {
+              desc = `${torqueDesc} | ${startStopDesc} | ${steeringDesc} | (RDKS+ CAN & DSR not used in PQ25)`;
+            }
           } else if (byteIndex === "10") {
-            const hhc = val & 0x01;
-            const tpms = (val & 0x06).toString(16).toUpperCase().padStart(2, '0');
-            const esc = (val & 0xF8).toString(16).toUpperCase().padStart(2, '0');
-            desc = `${lookupTable["10"].hhc[hhc] || "HHC: Unknown"} | ${lookupTable["10"].tpms[tpms] || "TPMS: Unknown"} | ${lookupTable["10"].esc[esc] || "ESC: Unknown"}`;
+            // Byte 16: ESP units only - Corrected implementation based on Drive2.ru specifications
+            const hhcBit = val & 0x01;           // bit 0: Hill Hold Control
+            const tpmsBits = (val & 0x06) >> 1;  // bits 1-2: TPMS system type
+            const escBits = (val & 0xF8) >> 3;   // bits 3-7: ESC/ASR menu combinations
+            
+            const hhcDesc = hhcBit ? "HHC: Enabled (Hill Hold Control)" : "HHC: Disabled";
+            
+            let tpmsDesc = "TPMS: Unknown";
+            // Corrected TPMS values from Drive2.ru
+            switch(tpmsBits) {
+              case 0: tpmsDesc = "TPMS: Disabled [7K0] (RKA/RKW/RDKS+/iTPMS+ disabled)"; break;
+              case 1: tpmsDesc = "TPMS: RKA/RKW enabled [7K6/7K9] (PQ25)"; break;
+              case 3: tpmsDesc = "TPMS: RDKS+/iTPMS+ enabled [7K1] (PQ25/PQ26)"; break;
+              default: tpmsDesc = `TPMS: Unknown configuration (${tpmsBits})`; break;
+            }
+            
+            let escDesc = "ESC/ASR: Unknown";
+            // ESC/ASR menu combinations from Drive2.ru - bits 3-7
+            switch(escBits) {
+              case 0x02: escDesc = "ESC: On, ASR Off (default)"; break;
+              case 0x09: escDesc = "ESC: On, ASR Off, Sport available"; break;
+              default: 
+                // Show raw value for unknown combinations
+                escDesc = `ESC/ASR: Configuration ${escBits.toString(16).toUpperCase()}h`;
+                // Add note about standard combinations
+                if (escBits === 0x10) escDesc = "ESC: On, ASR Off (standard)";
+                else if (escBits === 0x48) escDesc = "ESC: On, ASR Off, Sport mode";
+                break;
+            }
+            
+            desc = `${hhcDesc} | ${tpmsDesc} | ${escDesc}`;
           } else if (byteIndex === "11") {
-            const low = (val & 0x0F).toString(16).toUpperCase().padStart(2, '0');
-            const high = (val & 0xF0).toString(16).toUpperCase().padStart(2, '0');
-            desc = `${lookupTable["11"].low[low] || "EDS: Unknown"} | ${lookupTable["11"].high[high] || "Braking: Unknown"}`;
-          } else if (["08", "0A", "0C", "0E", "10", "12", "14", "0F"].includes(byteIndex) && lookupTable[byteIndex]?.checksum) {
-            const refIndex = { "08": 0, "0A": 2, "0C": 4, "0E": 6, "10": 2, "12": 4, "14": 6, "0F": 6 }[byteIndex];
+            // Byte 17: EDS Traction Control & Emergency Braking - Drive2.ru specifications  
+            const edsBits = val & 0x0F;   // bits 0-3: EDS traction control coefficient
+            const brakeBits = (val & 0xF0) >> 4; // bits 4-7: Emergency braking/radar messages
+            
+            let edsDesc = "EDS: Unknown configuration";
+            let brakeDesc = "Emergency Braking: Unknown";
+            
+            if (platform === "PQ25" || platform === "PQ26") {
+              // For 6R0614117* and 6R0614517* units (Rapid/Toledo) - Drive2.ru specs
+              switch(edsBits) {
+                case 0x01: edsDesc = "EDS: CWVB 1.6MPI 66kW"; break;
+                case 0x02: edsDesc = "EDS: CWVA 1.6MPI 81kW"; break;
+                case 0x03: edsDesc = "EDS: CWVA 1.6MPI 81kW + AISIN transmission"; break;
+                case 0x04: edsDesc = "EDS: CBZA/CJZC 1.2TSI 63/66kW, CHZB 1.0TSI 70kW"; break;
+                case 0x05: edsDesc = "EDS: CHZC 1.0TSI, CJZD 1.2TSI 81kW"; break;
+                case 0x06: edsDesc = "EDS: CZCA 1.4TSI 92kW"; break;
+                case 0x07: edsDesc = "EDS: CBZB 1.2TSI 77kW"; break;
+                case 0x08: edsDesc = "EDS: CUSB 1.4TDI 66kW, CAXA 1.4TSI 90kW"; break;
+                case 0x09: edsDesc = "EDS: CXMA 1.6TDI 85kW, CAIB 1.6TDI 66kW"; break;
+                case 0x0A: edsDesc = "EDS: CAYC 1.6TDI 77kW"; break;
+                default: edsDesc = `EDS: Unknown configuration (${edsBits.toString(16).toUpperCase()}h)`; break;
+              }
+              
+              // Radar/Emergency Braking for PQ25/PQ26 - Drive2.ru specs
+              switch(brakeBits) {
+                case 0x00: brakeDesc = "Radar: Not installed [6K0/7W0]"; break;
+                case 0x0B: brakeDesc = "Emergency Brake Sensor: Installed (AD block) [7W1] (PQ25)"; break;
+                case 0x0F: brakeDesc = "Front Assist: Installed (Block 13) [6K2] (PQ26)"; break;
+                default: brakeDesc = `Radar/Braking: Unknown (${brakeBits.toString(16).toUpperCase()}h)`; break;
+              }
+            } else {
+              // For 12E614517*, 1S0614117*, etc. units (up!/Mii/Citigo) - Drive2.ru specs
+              switch(edsBits) {
+                case 0x00: edsDesc = "EDS: CHYA/CHYB 1.0MPI 44/55kW, DKRA 1.0TSI 85kW"; break;
+                case 0x01: edsDesc = "EDS: CHYA/CHYB/CHYE 1.0MPI 44/55kW, CYTA 1.0TFS 77kW, CPGA 1.0CPI 50kW"; break;
+                case 0x02: edsDesc = "EDS: CFZA 1.6MPI 74kW, CHYA/CHYB 1.0MPI 44/55kW + SQ100"; break;
+                case 0x03: edsDesc = "EDS: CHZA 1.0TSI 66kW"; break;
+                case 0x06: edsDesc = "EDS: CFNA 1.6MPI 77kW, CWRA 1.0MPI 55kW"; break;
+                case 0x07: edsDesc = "EDS: CBZA 1.2TSI 63kW, CWRA 1.0MPI 55kW + SQ100"; break;
+                case 0x08: edsDesc = "EDS: EABA 60kW, EBMA 61kW, CFNA 1.6MPI 77kW + AQ250-6F, CPD 1.6MPI 81kW + AISIN"; break;
+                case 0x0A: edsDesc = "EDS: CBZB 1.2TSI 77kW"; break;
+                case 0x0C: edsDesc = "EDS: CAYB 1.6TDI 66kW"; break;
+                case 0x0D: edsDesc = "EDS: CAYC 1.6TDI 77kW"; break;
+                default: edsDesc = `EDS: Unknown configuration (${edsBits.toString(16).toUpperCase()}h)`; break;
+              }
+              
+              // Emergency Braking for up!/Mii/Citigo
+              switch(brakeBits) {
+                case 0x00: brakeDesc = "Emergency Braking: Not installed [7W0]"; break;
+                case 0x0B: brakeDesc = "Emergency Braking: Sensor installed [7W1]"; break;
+                default: brakeDesc = `Emergency Braking: Unknown (${brakeBits.toString(16).toUpperCase()}h)`; break;
+              }
+            }
+            
+            desc = `${edsDesc} | ${brakeDesc}`;
+          } else if (byteIndex === "12") {
+            // Byte 18: Always 00 - ABS sensor type configuration
+            desc = "ABS Sensors: Always 00. Reserved for active/passive sensor type (PLA requirement, unused)";
+          } else if (byteIndex === "13" && platform === "PQ26") {
+            // Byte 19: PQ26 only - MKB/MCB, ESC menu, RDKS+
+            const mkbBit = val & 0x01;    // bit 0: MKB/MCB
+            const escMenuBit = (val & 0x40) >> 6; // bit 6: ESC menu
+            const rdksBit = (val & 0x80) >> 7;    // bit 7: RDKS+
+            
+            const mkbDesc = mkbBit ? "MKB/MCB: Enabled (Multi-Collision Brake)" : "MKB/MCB: Disabled";
+            const menuDesc = escMenuBit ? "ESC Menu: Enabled" : "ESC Menu: Disabled";
+            const rdksDesc = rdksBit ? "RDKS+/TPMS+: Enabled" : "RDKS+/TPMS+: Disabled";
+            
+            desc = `${mkbDesc} | ${menuDesc} | ${rdksDesc}`;
+          } else if (["08", "0A", "0C", "0E", "10", "12", "14"].includes(byteIndex) && lookupTable[byteIndex]?.checksum) {
+            const refIndex = { "08": 0, "0A": 2, "0C": 4, "0E": 6, "10": 2, "12": 4, "14": 6 }[byteIndex];
             const refVal = parseInt(bytes[refIndex], 16);
             const checksum = reverseBits(refVal).toString(16).toUpperCase().padStart(2, '0');
-            desc = `Expected checksum of byte ${refIndex}: ${checksum} (from ${bytes[refIndex]})`;
+            const isValid = checksum === byte ? "✓" : "✗";
+            desc = `Checksum of byte ${refIndex}: Expected ${checksum}, Got ${byte} ${isValid}`;
           } else if (lookupTable[byteIndex]?.[byte]) {
             desc = lookupTable[byteIndex][byte];
           }
@@ -474,7 +1277,14 @@
           desc = "Error decoding byte";
         }
 
-        html += `<tr><td data-label="Byte #">${index}</td><td data-label="Hex">${byte}</td><td data-label="Description">${desc}</td></tr>`;
+        const rowClass = desc.includes("Checksum") ? (desc.includes("✓") ? "checksum-valid" : "checksum-invalid") : "";
+        html += `
+          <tr class="${rowClass}">
+            <td class="byte-number">${index}</td>
+            <td><span class="byte-hex">${byte}</span></td>
+            <td class="byte-description">${desc}</td>
+          </tr>
+        `;
       });
 
       const vin = document.getElementById("inputVIN").value.toUpperCase().replace(/\s+/g, "");
@@ -489,7 +1299,22 @@
           11: vin[15], // 16th VIN char
           13: vin[16]  // 17th VIN char
         };
-        html += '<tr><th colspan="3">VIN Validation</th></tr>';
+        html += `
+              </tbody>
+            </table>
+          </div>
+          <div class="results-table vin-validation-section">
+            <table>
+              <thead>
+                <tr>
+                  <th>VIN Validation</th>
+                  <th>Hex</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        
         Object.entries(vinMap).forEach(([pos, char]) => {
           const byteIndex = parseInt(pos).toString(16).toUpperCase().padStart(2, '0');
           const byteVal = bytes[parseInt(pos)].toUpperCase();
@@ -516,15 +1341,25 @@
           }
 
           const rowClass = match ? 'vin-valid' : 'vin-invalid';
-          const row = `<tr><td data-label="Byte">Byte ${pos}</td><td data-label="Hex">${byteVal}</td><td data-label="Expected" class="${rowClass}">Expected VIN char: ${char} → ${expectedDesc}</td></tr>`;
-
-          html += row;
+          html += `
+            <tr class="${rowClass}">
+              <td class="byte-number">Byte ${pos}</td>
+              <td><span class="byte-hex">${byteVal}</span></td>
+              <td class="byte-description">Expected VIN char: <strong>${char}</strong> → ${expectedDesc}</td>
+            </tr>
+          `;
         });
+
+        html += `
+              </tbody>
+            </table>
+          </div>
+        `;
 
       }
 
-      html += '</table>';
       outputDiv.innerHTML = html;
+      }, 500); // 500ms delay for loading animation
     }
   </script>
 </body>

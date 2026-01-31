@@ -1,6 +1,6 @@
 # Multi-Platform ABS LongCoding Decoder (EBC 460)
 
-Open the Websitehttps://phnahes.github.io/vw_ebc460_abs_decoder/
+[Open the Website](https://phnahes.github.io/vw_ebc460_abs_decoder/)
 
 This project is a **comprehensive web-based decoder for hexadecimal LongCoding values** used in Volkswagen (VW) ABS modules, specifically modules with ID **460 (EBC)**.
 
